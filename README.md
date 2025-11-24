@@ -51,6 +51,49 @@ pnpm dev
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Embed Widget
+
+This application can be embedded on external websites using a simple JavaScript snippet.
+
+### For Developers
+
+See [docs/EMBED_WIDGET.md](./docs/EMBED_WIDGET.md) for full documentation.
+
+### Quick Integration
+
+Add this code to your website before the closing `</body>` tag:
+
+```html
+<script>
+  window.PennieChatConfig = {
+    sfdcLeadId: 'YOUR_SALESFORCE_LEAD_ID',
+    position: 'bottom-right'
+  };
+</script>
+<script src="https://your-deployment-url.vercel.app/embed.js"></script>
+```
+
+### Test Locally
+
+1. Start dev server: `npm run dev`
+2. Open: [http://localhost:3000/embed-example.html](http://localhost:3000/embed-example.html)
+3. Click the chat button to test the widget
+
+### Configuration Options
+
+- `sfdcLeadId` (required): Your Salesforce Lead ID
+- `position` (optional): `'bottom-right'`, `'bottom-left'`, `'top-right'`, `'top-left'`
+- `theme` (optional): `'light'` or `'dark'`
+
+### Programmatic Control
+
+```javascript
+window.PennieChat.open();    // Open widget
+window.PennieChat.close();   // Close widget
+window.PennieChat.toggle();  // Toggle widget
+window.PennieChat.destroy(); // Remove widget
+```
+
 ## Using Docker
 
 ```
