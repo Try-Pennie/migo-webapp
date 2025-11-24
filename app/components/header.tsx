@@ -11,13 +11,21 @@ export interface IHeaderProps {
   isMobile?: boolean
   onShowSideBar?: () => void
   onCreateNewChat?: () => void
+  onBack?: () => void
+  onClose?: () => void
 }
 
-const Header: FC<IHeaderProps> = () => {
+const Header: FC<IHeaderProps> = ({
+  onBack,
+  onClose,
+}) => {
   return (
     <div className="shrink-0 flex items-center justify-between py-3 px-4 bg-gradient-to-r from-[#7F56D9] to-[#444CE7] text-white">
       {/* Left: Back Arrow */}
-      <div className="flex items-center justify-center w-8 h-8 cursor-pointer hover:bg-white/10 rounded-full">
+      <div 
+        className={`flex items-center justify-center w-8 h-8 rounded-full ${onBack ? 'cursor-pointer hover:bg-white/10' : 'opacity-0 pointer-events-none'}`}
+        onClick={onBack}
+      >
         <ArrowLeftIcon className="h-6 w-6 text-white" />
       </div>
 
@@ -39,7 +47,10 @@ const Header: FC<IHeaderProps> = () => {
       </div>
 
       {/* Right: Close Button */}
-      <div className="flex items-center justify-center w-8 h-8 cursor-pointer hover:bg-white/10 rounded-full">
+      <div 
+        className={`flex items-center justify-center w-8 h-8 rounded-full ${onClose ? 'cursor-pointer hover:bg-white/10' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
+      >
         <XMarkIcon className="h-6 w-6 text-white" />
       </div>
     </div>
