@@ -204,18 +204,20 @@ const Answer: FC<IAnswerProps> = ({
                   : (
                     <StreamdownMarkdown content={content} />
                   ))}
-              {suggestedQuestions.length > 0 && (
-                <div className="mt-3">
-                  <div className="flex gap-1 mt-1 flex-wrap">
-                    {suggestedQuestions.map((suggestion, index) => (
-                      <div key={index} className="flex items-center gap-1">
-                        <Button className="text-sm" type="link" onClick={() => suggestionClick(suggestion)}>{suggestion}</Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
+            {suggestedQuestions.length > 0 && (
+              <div className="flex flex-col gap-2 mt-2">
+                {suggestedQuestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center w-fit px-4 py-3 bg-white rounded-2xl border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => suggestionClick(suggestion)}
+                  >
+                    <span className="text-sm font-medium text-primary-600">{suggestion}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="absolute top-[-14px] right-[-14px] flex flex-row justify-end gap-1">
               {!feedbackDisabled && !item.feedbackDisabled && renderItemOperation()}
               {/* User feedback must be displayed */}

@@ -25,6 +25,7 @@ export interface IWelcomeProps {
   canEditInputs: boolean
   savedInputs: Record<string, any>
   onInputsChange: (inputs: Record<string, any>) => void
+  onClose?: () => void
 }
 
 const Welcome: FC<IWelcomeProps> = ({
@@ -37,6 +38,7 @@ const Welcome: FC<IWelcomeProps> = ({
   canEditInputs,
   savedInputs,
   onInputsChange,
+  onClose,
 }) => {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
@@ -346,6 +348,13 @@ const Welcome: FC<IWelcomeProps> = ({
   const renderMigoWelcome = () => {
     return (
       <div className={s.migoContainer}>
+        {onClose && (
+          <div className="absolute top-4 right-4 cursor-pointer p-2 hover:bg-white/10 rounded-full transition-colors" onClick={onClose}>
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-6 h-6">
+               <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />
+             </svg>
+          </div>
+        )}
         <div className="text-center mb-8">
           <div className={s.migoLogo}></div>
           <h1 className="text-white text-3xl font-bold mt-4">Hi, I&apos;m Migo!</h1>

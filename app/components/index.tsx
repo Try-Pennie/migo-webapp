@@ -51,6 +51,16 @@ const Main: FC<IMainProps> = () => {
   })
   const [fileConfig, setFileConfig] = useState<FileUpload | undefined>()
 
+  const [isInIframe, setIsInIframe] = useState(false)
+  useEffect(() => {
+    setIsInIframe(window.self !== window.top)
+  }, [])
+
+  const handleClose = () => {
+    window.parent.postMessage('close-chat-widget', '*')
+  }
+  const closeHandler = isInIframe ? handleClose : undefined
+
   useEffect(() => {
     if (APP_INFO?.title) { document.title = `${APP_INFO.title} - Powered by Dify` }
   }, [APP_INFO?.title])
@@ -654,7 +664,7 @@ const Main: FC<IMainProps> = () => {
           }
           setShowConversationList(false)
         }}
-        onClose={() => setShowConversationList(false)}
+        onClose={isInIframe ? closeHandler : () => setShowConversationList(false)}
       />
     )
   }
@@ -665,6 +675,7 @@ const Main: FC<IMainProps> = () => {
         title={APP_INFO.title}
         isMobile={isMobile}
         onBack={() => setShowConversationList(true)}
+        onClose={closeHandler}
       />
       <div className="flex-1 flex bg-white overflow-hidden relative">
         {/* main */}
@@ -679,6 +690,7 @@ const Main: FC<IMainProps> = () => {
             canEditInputs={canEditInputs}
             savedInputs={currInputs as Record<string, any>}
             onInputsChange={setCurrInputs}
+            onClose={closeHandler}
           ></ConfigSence>
 
           {
