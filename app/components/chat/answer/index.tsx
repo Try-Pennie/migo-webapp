@@ -177,19 +177,19 @@ const Answer: FC<IAnswerProps> = ({
   )
 
   return (
-    <div key={id}>
-      <div className="flex items-start">
-        <div className={`${s.answerIcon} w-10 h-10 shrink-0`}>
-          {isResponding
-            && (
-              <div className={s.typeingIcon}>
-                <LoadingAnim type="avatar" />
-              </div>
-            )}
-        </div>
-        <div className={`${s.answerWrap} max-w-[calc(100%-3rem)]`}>
+    <div key={id} className="flex flex-col items-start mb-6">
+      {/* Label: Name + Time */}
+      <div className="flex items-center gap-2 mb-1.5 ml-1">
+         <span className="text-xs font-medium text-gray-700">Migo</span>
+         <span className="text-xs text-gray-400">10:00 AM</span>
+      </div>
+
+      <div className="flex items-start w-full">
+        {/* Removed Avatar */}
+        
+        <div className={`${s.answerWrap} max-w-[calc(100%-1rem)]`}>
           <div className={`${s.answer} relative text-sm text-gray-900`}>
-            <div className={`ml-2 py-3 px-4 bg-gray-100 rounded-tr-2xl rounded-b-2xl ${workflowProcess && 'min-w-[480px]'}`}>
+            <div className={`py-3.5 px-5 bg-[#F2F4F7] rounded-2xl ${workflowProcess && 'min-w-[480px]'}`}>
               {workflowProcess && (
                 <WorkflowProcess data={workflowProcess} hideInfo />
               )}

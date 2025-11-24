@@ -18,6 +18,8 @@ import { useImageFiles } from '@/app/components/base/image-uploader/hooks'
 import FileUploaderInAttachmentWrapper from '@/app/components/base/file-uploader-in-attachment'
 import type { FileEntity, FileUpload } from '@/app/components/base/file-uploader-in-attachment/types'
 import { getProcessedFiles } from '@/app/components/base/file-uploader-in-attachment/utils'
+import { PaperClipIcon, FaceSmileIcon } from '@heroicons/react/24/outline'
+import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 
 export interface IChatProps {
   chatList: ChatItem[]
@@ -142,96 +144,108 @@ const Chat: FC<IChatProps> = ({
   }
 
   return (
-    <div className={cn(!feedbackDisabled && 'px-3.5', 'h-full')}>
+    <div className={cn(!feedbackDisabled && 'px-3.5', 'h-full flex flex-col')}>
       {/* Chat List */}
-      <div className="h-full space-y-[30px]">
-        {chatList.map((item) => {
-          if (item.isAnswer) {
-            const isLast = item.id === chatList[chatList.length - 1].id
-            return <Answer
-              key={item.id}
-              item={item}
-              feedbackDisabled={feedbackDisabled}
-              onFeedback={onFeedback}
-              isResponding={isResponding && isLast}
-              suggestionClick={suggestionClick}
-            />
-          }
-          return (
-            <Question
-              key={item.id}
-              id={item.id}
-              content={item.content}
-              useCurrentUserAvatar={useCurrentUserAvatar}
-              imgSrcs={(item.message_files && item.message_files?.length > 0) ? item.message_files.map(item => item.url) : []}
-            />
-          )
-        })}
+      <div className="flex-1 overflow-y-auto pb-[140px]">
+        {/* Date Separator */}
+        <div className="flex justify-center py-6">
+           <span className="text-xs text-gray-500 font-medium">Monday, 10 November</span>
+        </div>
+
+        <div className="space-y-[20px]">
+          {chatList.map((item) => {
+            if (item.isAnswer) {
+              const isLast = item.id === chatList[chatList.length - 1].id
+              return <Answer
+                key={item.id}
+                item={item}
+                feedbackDisabled={feedbackDisabled}
+                onFeedback={onFeedback}
+                isResponding={isResponding && isLast}
+                suggestionClick={suggestionClick}
+              />
+            }
+            return (
+              <Question
+                key={item.id}
+                id={item.id}
+                content={item.content}
+                useCurrentUserAvatar={useCurrentUserAvatar}
+                imgSrcs={(item.message_files && item.message_files?.length > 0) ? item.message_files.map(item => item.url) : []}
+                item={item}
+              />
+            )
+          })}
+        </div>
       </div>
+      
       {
         !isHideSendInput && (
-          <div className='fixed z-10 bottom-0 left-1/2 transform -translate-x-1/2 pc:ml-[122px] tablet:ml-[96px] mobile:ml-0 pc:w-[794px] tablet:w-[794px] max-w-full mobile:w-full px-3.5'>
-            <div className='p-[5.5px] max-h-[150px] bg-white border-[1.5px] border-gray-200 rounded-xl overflow-y-auto'>
-              {
-                visionConfig?.enabled && (
-                  <>
-                    <div className='absolute bottom-2 left-2 flex items-center'>
-                      <ChatImageUploader
-                        settings={visionConfig}
-                        onUpload={onUpload}
-                        disabled={files.length >= visionConfig.number_limits}
-                      />
-                      <div className='mx-1 w-[1px] h-4 bg-black/5' />
+          <div className='fixed z-10 bottom-0 left-0 w-full pb-6 px-4'>
+             <div className="max-w-[800px] mx-auto">
+                 {/* Handle File/Image Upload Previews if any */}
+                 {(visionConfig?.enabled && files.length > 0) || (fileConfig?.enabled && attachmentFiles.length > 0) ? (
+                    <div className="mb-2 bg-white rounded-xl p-2 border border-gray-200 shadow-sm">
+                        {visionConfig?.enabled && files.length > 0 && (
+                             <ImageList
+                                list={files}
+                                onRemove={onRemove}
+                                onReUpload={onReUpload}
+                                onImageLinkLoadSuccess={onImageLinkLoadSuccess}
+                                onImageLinkLoadError={onImageLinkLoadError}
+                             />
+                        )}
+                        {fileConfig?.enabled && (
+                            <FileUploaderInAttachmentWrapper
+                                fileConfig={fileConfig}
+                                value={attachmentFiles}
+                                onChange={setAttachmentFiles}
+                            />
+                        )}
                     </div>
-                    <div className='pl-[52px]'>
-                      <ImageList
-                        list={files}
-                        onRemove={onRemove}
-                        onReUpload={onReUpload}
-                        onImageLinkLoadSuccess={onImageLinkLoadSuccess}
-                        onImageLinkLoadError={onImageLinkLoadError}
-                      />
+                 ) : null}
+
+                <div className='relative flex items-center w-full bg-white rounded-full border border-gray-200 shadow-lg px-2 py-2'>
+                     {/* Paperclip / Upload Trigger */}
+                    <div className="flex-shrink-0 p-2 cursor-pointer text-gray-400 hover:text-gray-600 relative">
+                         <PaperClipIcon className="w-6 h-6" />
+                         {/* Re-enable upload functionality using opacity 0 if needed, or just keep visual for now */}
+                         {visionConfig?.enabled && (
+                            <div className="absolute inset-0 opacity-0">
+                                <ChatImageUploader
+                                    settings={visionConfig}
+                                    onUpload={onUpload}
+                                    disabled={files.length >= visionConfig.number_limits}
+                                />
+                            </div>
+                         )}
                     </div>
-                  </>
-                )
-              }
-              {
-                fileConfig?.enabled && (
-                  <div className={`${visionConfig?.enabled ? 'pl-[52px]' : ''} mb-1`}>
-                    <FileUploaderInAttachmentWrapper
-                      fileConfig={fileConfig}
-                      value={attachmentFiles}
-                      onChange={setAttachmentFiles}
+                    
+                    {/* Input */}
+                    <Textarea
+                        className="flex-1 bg-transparent border-none outline-none text-gray-700 px-3 py-1 text-base resize-none max-h-[120px]"
+                        placeholder="Ask me anything"
+                        value={query}
+                        onChange={handleContentChange}
+                        onKeyUp={handleKeyUp}
+                        onKeyDown={handleKeyDown}
+                        autoSize={{ minRows: 1, maxRows: 5 }}
                     />
-                  </div>
-                )
-              }
-              <Textarea
-                className={`
-                  block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-base text-gray-700 outline-none appearance-none resize-none
-                  ${visionConfig?.enabled && 'pl-12'}
-                `}
-                value={query}
-                onChange={handleContentChange}
-                onKeyUp={handleKeyUp}
-                onKeyDown={handleKeyDown}
-                autoSize
-              />
-              <div className="absolute bottom-2 right-6 flex items-center h-8">
-                <div className={`${s.count} mr-3 h-5 leading-5 text-sm bg-gray-50 text-gray-500 px-2 rounded`}>{query.trim().length}</div>
-                <Tooltip
-                  selector='send-tip'
-                  htmlContent={
-                    <div>
-                      <div>{t('common.operation.send')} Enter</div>
-                      <div>{t('common.operation.lineBreak')} Shift Enter</div>
+
+                     {/* Smiley */}
+                    <div className="flex-shrink-0 p-2 cursor-pointer text-gray-400 hover:text-gray-600">
+                         <FaceSmileIcon className="w-6 h-6" />
                     </div>
-                  }
-                >
-                  <div className={`${s.sendBtn} w-8 h-8 cursor-pointer rounded-md`} onClick={handleSend}></div>
-                </Tooltip>
-              </div>
-            </div>
+
+                     {/* Send Button */}
+                    <div 
+                        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer ml-1 transition-colors duration-200 ${query.trim() ? 'bg-[#101828] hover:bg-gray-800' : 'bg-[#101828] opacity-100'}`}
+                        onClick={handleSend}
+                    >
+                        <PaperAirplaneIcon className="w-5 h-5 text-white" />
+                    </div>
+                </div>
+             </div>
           </div>
         )
       }
