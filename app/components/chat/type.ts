@@ -98,6 +98,7 @@ export interface IChatItem {
   useCurrentUserAvatar?: boolean
   isOpeningStatement?: boolean
   suggestedQuestions?: string[]
+  isFetchingSuggestions?: boolean
   log?: { role: string, text: string }[]
   agent_thoughts?: ThoughtItem[]
   message_files?: VisionFile[]
@@ -114,6 +115,7 @@ export interface MessageEnd {
         name: string
       }
     }
+    suggested_questions?: string[]
   }
 }
 

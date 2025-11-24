@@ -206,7 +206,7 @@ const Answer: FC<IAnswerProps> = ({
                   ))}
             </div>
             {suggestedQuestions.length > 0 && (
-              <div className="flex flex-col gap-2 mt-2">
+              <div className="flex flex-col items-end gap-2 mt-2">
                 {suggestedQuestions.map((suggestion, index) => (
                   <div
                     key={index}

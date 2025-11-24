@@ -9,7 +9,7 @@ import Toast from '@/app/components/base/toast'
 import ConversationList from '@/app/components/conversation-list'
 import ConfigSence from '@/app/components/config-scence'
 import Header from '@/app/components/header'
-import { fetchAppParams, fetchChatList, fetchConversations, generationConversationName, sendChatMessage, updateFeedback } from '@/service'
+import { fetchAppParams, fetchChatList, fetchConversations, fetchSuggestedQuestions, generationConversationName, sendChatMessage, updateFeedback } from '@/service'
 import type { ChatItem, ConversationItem, Feedbacktype, PromptConfig, VisionFile, VisionSettings } from '@/types/app'
 import type { FileUpload } from '@/app/components/base/file-uploader-in-attachment/types'
 import { Resolution, TransferMethod, WorkflowRunningStatus } from '@/types/app'
@@ -93,6 +93,9 @@ const Main: FC<IMainProps> = () => {
     setExistConversationInfo,
   } = useConversation()
 
+  // Cache for suggested questions by message ID to persist across conversation switches
+  const suggestionsRef = useRef<Record<string, string[]>>({})
+
   const [conversationIdChangeBecauseOfNew, setConversationIdChangeBecauseOfNew, getConversationIdChangeBecauseOfNew] = useGetState(false)
   const [isChatStarted, { setTrue: setChatStarted, setFalse: setChatNotStarted }] = useBoolean(false)
   const handleStartChat = (inputs: Record<string, any>) => {
@@ -102,9 +105,15 @@ const Main: FC<IMainProps> = () => {
     setChatStarted()
     // parse variables in introduction
     setChatList(generateNewChatListWithOpenStatement('', inputs))
+    // Mark that user has used Migo
+    localStorage.setItem('hasUsedMigo', 'true')
   }
   const hasSetInputs = (() => {
     if (!isNewConversation) { return true }
+
+    // Check if user has used Migo before
+    const hasUsedMigoBefore = localStorage.getItem('hasUsedMigo') === 'true'
+    if (hasUsedMigoBefore) { return true }
 
     return isChatStarted
   })()
@@ -149,6 +158,19 @@ const Main: FC<IMainProps> = () => {
             message_files: item.message_files?.filter((file: any) => file.belongs_to === 'user') || [],
 
           })
+          // The API response for fetchChatList likely does not contain suggested_questions.
+          // We need to check if the item is already in the current chat list or in our cache and if it has suggested questions.
+          // Note: We use getChatList() here to ensure we have the latest state.
+          const existingItem = getChatList().find(i => i.id === item.id)
+
+          if (item.suggested_questions) {
+            suggestionsRef.current[item.id] = item.suggested_questions
+          }
+
+          // Initial welcome suggestions are stored in currConversationInfo.suggested_questions
+          // If this is the first message and it has no suggestions in API/cache, we might want to check 
+          // if it corresponds to the opening statement, but opening statement is handled separately.
+
           newChatList.push({
             id: item.id,
             content: item.answer,
@@ -156,6 +178,7 @@ const Main: FC<IMainProps> = () => {
             feedback: item.feedback,
             isAnswer: true,
             message_files: item.message_files?.filter((file: any) => file.belongs_to === 'assistant') || [],
+            suggestedQuestions: item.suggested_questions || existingItem?.suggestedQuestions || suggestionsRef.current[item.id],
           })
         })
         setChatList(newChatList)
@@ -332,6 +355,13 @@ const Main: FC<IMainProps> = () => {
   const [hasStopResponded, setHasStopResponded, getHasStopResponded] = useGetState(false)
   const [isRespondingConIsCurrCon, setIsRespondingConCurrCon, getIsRespondingConIsCurrCon] = useGetState(true)
   const [userQuery, setUserQuery] = useState('')
+
+  // Cache for suggested questions by message ID to persist across conversation switches
+  // We can move this to a higher scope or custom hook if needed, but since Main is the router container,
+  // it stays mounted when switching chats (unless layout changes).
+  // const suggestionsRef = useRef<Record<string, string[]>>({})
+  // Moving suggestionsRef higher up was a mistake in the previous step if it was duplicated. 
+  // Let's just remove the duplicated declaration down below.
 
   const updateCurrentQA = ({
     responseItem,
@@ -554,6 +584,10 @@ const Main: FC<IMainProps> = () => {
         }
         // not support show citation
         // responseItem.citation = messageEnd.retriever_resources
+        if (messageEnd.metadata?.suggested_questions) {
+          responseItem.suggestedQuestions = messageEnd.metadata.suggested_questions
+          suggestionsRef.current[messageEnd.id] = messageEnd.metadata.suggested_questions
+        }
         const newListWithAnswer = produce(
           getChatList().filter(item => item.id !== responseItem.id && item.id !== placeholderAnswerId),
           (draft) => {
@@ -563,6 +597,27 @@ const Main: FC<IMainProps> = () => {
           },
         )
         setChatList(newListWithAnswer)
+
+        // Fetch suggested questions if not provided in metadata
+        if (!messageEnd.metadata?.suggested_questions) {
+          fetchSuggestedQuestions(messageEnd.id).then((res: any) => {
+            // Parse response - the API route returns the data directly from Dify
+            const suggestions = res?.data || res || []
+
+            if (Array.isArray(suggestions) && suggestions.length > 0) {
+              // Use functional update to avoid race conditions
+              setChatList(prev => produce(prev, (draft) => {
+                const current = draft.find(item => item.id === messageEnd.id)
+                if (current) {
+                  current.suggestedQuestions = suggestions
+                  suggestionsRef.current[messageEnd.id] = suggestions
+                }
+              }))
+            }
+          }).catch((err) => {
+            console.error('[Suggested Questions] Failed to fetch for message:', messageEnd.id, err)
+          })
+        }
       },
       onMessageReplace: (messageReplace) => {
         setChatList(produce(
