@@ -70,7 +70,7 @@ Add this code to your website before the closing `</body>` tag:
     position: 'bottom-right'
   };
 </script>
-<script src="https://your-deployment-url.vercel.app/embed.js"></script>
+<script src="https://ai-chatbot-sandbox.vercel.app/embed.js"></script>
 ```
 
 ### Test Locally

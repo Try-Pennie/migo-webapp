@@ -10,7 +10,7 @@ Add this code to your website before the closing `</body>` tag:
     sfdcLeadId: 'YOUR_SALESFORCE_LEAD_ID'
   };
 </script>
-<script src="https://YOUR-DOMAIN.vercel.app/embed.js"></script>
+<script src="https://ai-chatbot-sandbox.vercel.app/embed.js"></script>
 ```
 
 ## Configuration Options
@@ -51,7 +51,7 @@ window.PennieChat.destroy();
 ```javascript
 // Load script dynamically
 const script = document.createElement('script');
-script.src = 'https://YOUR-DOMAIN.vercel.app/embed.js';
+script.src = 'https://ai-chatbot-sandbox.vercel.app/embed.js';
 script.onload = function() {
   window.PennieChat.init({
     sfdcLeadId: 'dynamic-lead-id-123',
@@ -74,7 +74,7 @@ document.body.appendChild(script);
     widgetHeight: 650      // Custom widget height
   };
 </script>
-<script src="https://YOUR-DOMAIN.vercel.app/embed.js"></script>
+<script src="https://ai-chatbot-sandbox.vercel.app/embed.js"></script>
 ```
 
 ## Integration Examples
@@ -89,7 +89,7 @@ Add to your theme's `footer.php` before `</body>`:
     sfdcLeadId: '<?php echo get_user_meta(get_current_user_id(), 'sfdc_lead_id', true); ?>'
   };
 </script>
-<script src="https://YOUR-DOMAIN.vercel.app/embed.js"></script>
+<script src="https://ai-chatbot-sandbox.vercel.app/embed.js"></script>
 ```
 
 ### React/Next.js
@@ -101,7 +101,7 @@ export default function Layout({ children }) {
   useEffect(() => {
     // Load embed script
     const script = document.createElement('script');
-    script.src = 'https://YOUR-DOMAIN.vercel.app/embed.js';
+    script.src = 'https://ai-chatbot-sandbox.vercel.app/embed.js';
 
     // Configure widget
     window.PennieChatConfig = {
@@ -133,7 +133,7 @@ Add to your theme's `theme.liquid` before `</body>`:
     sfdcLeadId: '{{ customer.tags | first }}'
   };
 </script>
-<script src="https://YOUR-DOMAIN.vercel.app/embed.js"></script>
+<script src="https://ai-chatbot-sandbox.vercel.app/embed.js"></script>
 ```
 
 ## Troubleshooting
@@ -168,7 +168,7 @@ Add to your theme's `theme.liquid` before `</body>`:
    - Test from different domains
 
 3. **Ensure /chat route is accessible**
-   - Visit https://YOUR-DOMAIN.vercel.app/chat directly
+   - Visit https://ai-chatbot-sandbox.vercel.app/chat directly
    - Check for 404 or 500 errors
 
 ### Widget positioned incorrectly?
@@ -218,9 +218,9 @@ If your site uses CSP, add these directives:
 
 ```
 Content-Security-Policy:
-  frame-src https://YOUR-DOMAIN.vercel.app;
-  script-src https://YOUR-DOMAIN.vercel.app;
-  img-src https://YOUR-DOMAIN.vercel.app;
+  frame-src https://ai-chatbot-sandbox.vercel.app;
+  script-src https://ai-chatbot-sandbox.vercel.app;
+  img-src https://ai-chatbot-sandbox.vercel.app;
 ```
 
 ## Performance
@@ -311,7 +311,7 @@ window.addEventListener('message', (event) => {
 ## Support
 
 For integration support:
-- Check the [example page](https://YOUR-DOMAIN.vercel.app/embed-example.html)
+- Check the [example page](https://ai-chatbot-sandbox.vercel.app/embed-example.html)
 - Review troubleshooting section above
 - Contact: support@pennie.ai
 
